@@ -261,27 +261,27 @@ void execute() {
           break;
         case ALU_ADD3I:
           // needs stats and flags
-          rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + 4*alu.instr.add3i.imm);
+          rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
           // needs stats and flags
-          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - 4*alu.instr.sub3i.imm);
+          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
           break;
         case ALU_MOV:
           // needs stats and flags
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
-          setFlags(rf[alu.instr.cmp.rdn] - 4*alu.instr.cmp.imm);
-          setCarryOverflow(rf[alu.instr.cmp.rdn], 4*alu.instr.cmp.imm, OF_SUB);
+          setFlags(rf[alu.instr.cmp.rdn] - alu.instr.cmp.imm);
+          setCarryOverflow(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
           break;
         case ALU_ADD8I:
           // needs stats and flags
-          rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + 4*alu.instr.add8i.imm);
+          rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
           // needs stats and flags
-          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - 4*alu.instr.sub8i.imm);
+          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           break;
         default:
           cout << "instruction not implemented" << endl;
