@@ -248,40 +248,65 @@ void execute() {
   switch(itype) {
     case ALU:
       add_ops = decode(alu);
-      switch(add_ops) {
+      switch(add_ops) {// do all these flags need to be conditionally set???
         case ALU_LSLI:
+          // needs stats
+          // needs flags: COMPLETE
+          rf.write(alu.instr.add3i.rd, rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
+          setFlags(rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
+          setCarryOverflow(rf[alu.instr.lsli.rm], alu.instr.lsli.imm, OF_SHIFT);
           break;
         case ALU_ADDR:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+          setFlags(rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+          setCarryOverflow(rf[alu.instr.addr.rn], rf[alu.instr.addr.rm], OF_ADD);
           break;
         case ALU_SUBR:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.subr.rd, rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
+          setFlags(rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
+          setCarryOverflow(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
           break;
         case ALU_ADD3I:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          setFlags(rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          setCarryOverflow(rf[alu.instr.add3i.rn], alu.instr.add3i.imm, OF_ADD);
           break;
         case ALU_SUB3I:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
+          setFlags(rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
+          setCarryOverflow(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
           break;
         case ALU_MOV:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
+          setFlags(rf[alu.instr.mov.imm]);
           break;
         case ALU_CMP:
           setFlags(rf[alu.instr.cmp.rdn] - alu.instr.cmp.imm);
           setCarryOverflow(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
           break;
         case ALU_ADD8I:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          setFlags(rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          setCarryOverflow(rf[alu.instr.add8i.rdn], alu.instr.add8i.imm, OF_ADD);
           break;
         case ALU_SUB8I:
-          // needs stats and flags
+          // needs stats
+          // needs flags: COMPLETE
           rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
+          setFlags(rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
+          setCarryOverflow(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
           break;
         default:
           cout << "instruction not implemented" << endl;
@@ -325,7 +350,8 @@ void execute() {
       switch(dp_ops) {
         case DP_CMP:
           // need to implement: COMPLETE
-          // needs stats and flags
+          // needs stats 
+          // needs flags: COMPLETE
           setFlags(rf[dp.instr.DP_Instr.rdn] - rf[dp.instr.DP_Instr.rm]);
           setCarryOverflow(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
           break;
@@ -335,16 +361,24 @@ void execute() {
       sp_ops = decode(sp);
       switch(sp_ops) {
         case SP_MOV:
-          // needs stats and flags
+          // needs stats
+          // flags: COMPLETE
           rf.write((sp.instr.mov.d << 3 ) | sp.instr.mov.rd, rf[sp.instr.mov.rm]);
+          setFlags(rf[sp.instr.mov.rm]);
           break;
         case SP_ADD:
-          // need to implement
-          // needs stats and flags
+          // need to implement: (i think?) COMPLETE
+          // needs stats 
+          // needs flags: COMPLETE
+          i = (sp.instr.add.d << 3 ) | sp.instr.add.rd;
+          rf.write(i, rf[i] + rf[sp.instr.add.rm]);
+          setFlags(rf[i] + rf[sp.instr.add.rm]);
+          setCarryOverflow(rf[i], rf[sp.instr.add.rm], OF_ADD);
           break;
         case SP_CMP: //page 394
-          setFlags(rf[sp.instr.cmp.rd] - rf[sp.instr.cmp.rm]);
-          setCarryOverflow(rf[sp.instr.cmp.rd], rf[sp.instr.cmp.rm], OF_SUB);
+          i = (sp.instr.cmp.d << 3 ) | sp.instr.cmp.rd;
+          setFlags(rf[i] - rf[sp.instr.cmp.rm]);
+          setCarryOverflow(rf[i], rf[sp.instr.cmp.rm], OF_SUB);
           break;
       }
       break;
