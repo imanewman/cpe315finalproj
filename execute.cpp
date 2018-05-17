@@ -37,7 +37,29 @@ void setFlags(int val) {
   } else if (val < 0) {
     flags.N = 1;
     flags.Z = 0;
+  } else {
+    flags.N = 0;
+    flags.Z = 0;
   }
+}
+
+int countBits(int reg_list) {
+  int i, cnt = 0;
+
+  for (i = 0; i < 8; i++)
+    if ((reg_list >> i ) & 1)
+      cnt++;
+
+  return cnt;
+}
+
+void printRegisters(int s) {
+  cout << "REG VALUES: " << endl;
+  cout << " 0: " << rf[0] << " 1: " << rf[1] << " 2: " << rf[2] << " 3: " << rf[3] << endl; 
+  cout << " 4: " << rf[4] << " 5: " << rf[5] << " 6: " << rf[6] << " 7: " << rf[7] << endl;
+  cout << " PC: " << hex << rf[PC_REG] << " LR: " << rf[LR_REG] << " SP: " << hex << rf[SP_REG] << endl; 
+  cout << " N: " << flags.N << " Z: " << flags.Z << " C: " << flags.C << " V: " << flags.V << endl;
+  sleep(s);
 }
 
 // This function is complete, you should not have to modify it
@@ -239,26 +261,27 @@ void execute() {
           break;
         case ALU_ADD3I:
           // needs stats and flags
-          rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + 4*alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
           // needs stats and flags
-          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - rf[alu.instr.sub3i.imm]);
+          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - 4*alu.instr.sub3i.imm);
           break;
         case ALU_MOV:
           // needs stats and flags
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
-          setFlags(rf[alu.instr.cmp.rdn] - rf[alu.instr.cmp.imm]);
+          setFlags(rf[alu.instr.cmp.rdn] - 4*alu.instr.cmp.imm);
+          setCarryOverflow(rf[alu.instr.cmp.rdn], 4*alu.instr.cmp.imm, OF_SUB);
           break;
         case ALU_ADD8I:
           // needs stats and flags
-          rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + 4*alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
           // needs stats and flags
-          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - rf[alu.instr.sub8i.imm]);
+          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - 4*alu.instr.sub8i.imm);
           break;
         default:
           cout << "instruction not implemented" << endl;
@@ -304,6 +327,7 @@ void execute() {
           // need to implement: COMPLETE
           // needs stats and flags
           setFlags(rf[dp.instr.DP_Instr.rdn] - rf[dp.instr.DP_Instr.rm]);
+          setCarryOverflow(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
           break;
       }
       break;
@@ -320,6 +344,7 @@ void execute() {
           break;
         case SP_CMP: //page 394
           setFlags(rf[sp.instr.cmp.rd] - rf[sp.instr.cmp.rm]);
+          setCarryOverflow(rf[sp.instr.cmp.rd], rf[sp.instr.cmp.rm], OF_SUB);
           break;
       }
       break;
@@ -351,7 +376,7 @@ void execute() {
         case STRBI:
           // need to implement
           break;
-        case LDRBI: //pg 438, 440
+        case LDRBI: //pg 438, 440 (use data.data_ubyte4(0)?)
           // need to implement
           break;
         case STRBR:
@@ -368,22 +393,40 @@ void execute() {
         case MISC_PUSH: //page 560
           // need to implement: COMPLETE
           // needs stats
-          for (i = 0; i < 15; i++) {
-            if ((misc.instr.push.reg_list >> i ) | 1) {
-              rf.write(SP_REG, SP - 4); //is this still 4 in thumb?
-              rf.write(SP, rf[i]);
+          offset = 4*(countBits(misc.instr.push.reg_list) + misc.instr.push.m);
+          addr = SP - offset;
+          //cout << "addr: " << addr << endl;
+          for (i = 0; i < 8; i++) {
+            if ((misc.instr.push.reg_list >> i ) & 1) {
+              dmem.write(addr, rf[i]);
+              addr += 4;
             }
           }
+          if (misc.instr.push.m) {
+            dmem.write(addr, LR);
+            addr += 4;
+          }
+
+          rf.write(SP_REG, SP - offset);
           break;
         case MISC_POP:
           // need to implement: COMPLETE
           // needs stats
-          for (i = 14; i >= 0; i--) {
-            if ((misc.instr.pop.reg_list >> i ) | 1) {
-              rf.write(i, dmem[SP]);
-              rf.write(SP_REG, SP + 4); //is this still 4 in thumb?
+          offset = 4*(countBits(misc.instr.pop.reg_list) + misc.instr.pop.m);
+          addr = SP + offset;
+
+          if (misc.instr.pop.m) {
+            rf.write(PC_REG, dmem[addr]);
+            addr -= 4;
+          }
+          for (i = 8; i >= 0; i--) {
+            if ((misc.instr.pop.reg_list >> i ) & 1) {
+              rf.write(i, dmem[addr]);
+              addr -= 4;
             }
           }
+
+          rf.write(SP_REG, SP + offset);
           break;
         case MISC_SUB:
           // functionally complete, needs stats
@@ -449,4 +492,5 @@ void execute() {
       exit(1);
       break;
   }
+  //printRegisters(1);
 }
