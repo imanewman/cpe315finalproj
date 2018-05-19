@@ -242,6 +242,7 @@ void execute() {
   // This counts as a write to the PC register
   rf.write(PC_REG, pctarget);
   stats.numRegWrites++;
+  stats.numRegReads++;
 
   itype = decode(ALL_Types(instr));
 
@@ -320,7 +321,7 @@ void execute() {
           setFlags(rf[alu.instr.cmp.rdn] - alu.instr.cmp.imm);
           setCarryOverflow(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
 
-          stats.numRegReads += 2;
+          stats.numRegReads++;
           break;
         case ALU_ADD8I:
           // needs stats: COMPLETE
@@ -541,7 +542,7 @@ void execute() {
           rf.write(SP_REG, SP - offset);
 
           stats.numMemWrites += BitCount;
-          stats.numRegReads += BitCount;
+          stats.numRegReads += BitCount + 1;
           stats.numRegWrites++;
           break;
         case MISC_POP:
@@ -566,6 +567,7 @@ void execute() {
 
           stats.numMemReads += BitCount;
           stats.numRegWrites += BitCount + 1;
+          stats.numRegReads++;
           break;
         case MISC_SUB:
           // functionally complete, needs stats: COMPLETE
