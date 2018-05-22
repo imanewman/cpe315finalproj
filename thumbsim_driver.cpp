@@ -109,6 +109,10 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 // cache size in blocks). You should also update the "hits" and
 // "misses" counters.
 bool Cache::access(unsigned int address) {
+  int addr = address % blocksize;
+
+  //if (entries[addr])
+
   return false;
 }
 

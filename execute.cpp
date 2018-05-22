@@ -23,6 +23,13 @@ unsigned int signExtend8to32ui(char i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
 
+unsigned int signExtend11to32ui(short i) {
+  if (i & 0x0400) 
+    i |= 0xf800;
+
+  return signExtend16to32ui(i);
+}
+
 // This is the global object you'll use to store condition codes N,Z,V,C
 // Set these bits appropriately in execute below.
 ASPR flags;
@@ -589,7 +596,7 @@ void execute() {
       decode(cond);
       // Once you've completed the checkCondition function,
       // this should work for all your conditional branches.
-      // needs stats
+      // needs stats: COMPLETE
       offset = 2 * signExtend8to32ui(cond.instr.b.imm) + 2;
 
       if (checkCondition(cond.instr.b.cond)){
@@ -613,9 +620,9 @@ void execute() {
       // Essentially the same as the conditional branches, but with no
       // condition check, and an 11-bit immediate field
       decode(uncond);
-      offset = 2 * signExtend16to32ui(uncond.instr.b.imm) + 2;
+      offset = 2 * signExtend11to32ui(uncond.instr.b.imm) + 2; //needs new SE func?
 
-      rf.write(PC_REG, PC + offset); //needs new SE func?
+      rf.write(PC_REG, PC + offset); 
 
       stats.numRegReads++;
       stats.numRegWrites++;
@@ -623,10 +630,42 @@ void execute() {
     case LDM:
       decode(ldm);
       // need to implement
+      BitCount = countBits(ldm.instr.ldm.reg_list);
+      offset = 4*BitCount;
+      addr =  rf[ldm.instr.ldm.rn] + offset;
+
+      for (i = 8; i >= 0; i--) {
+        if ((ldm.instr.ldm.reg_list >> i ) & 1) {
+          rf.write(i, dmem[addr]);
+          addr -= 4;
+        }
+      }
+
+      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] + offset);
+
+      stats.numMemReads += BitCount;
+      stats.numRegWrites += BitCount + 1;
+      stats.numRegReads++;
       break;
     case STM:
       decode(stm);
       // need to implement
+      BitCount = countBits(stm.instr.stm.reg_list);
+      offset = 4*BitCount;
+      addr = rf[stm.instr.stm.rn] - offset;
+      //cout << "addr: " << addr << endl;
+      for (i = 0; i < 8; i++) {
+        if ((stm.instr.stm.reg_list >> i ) & 1) {
+          dmem.write(addr, rf[i]);
+          addr += 4;
+        }
+      }
+
+      rf.write(stm.instr.stm.rn, rf[stm.instr.stm.rn] - offset);
+
+      stats.numMemWrites += BitCount;
+      stats.numRegReads += BitCount + 1;
+      stats.numRegWrites++;
       break;
     case LDRL:
       // This instruction is complete, nothing needed
@@ -650,7 +689,7 @@ void execute() {
       stats.numMemReads++;
       break;
     case ADD_SP:
-      // needs stats
+      // needs stats: COMPLETE
       decode(addsp);
       rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm*4));
 
