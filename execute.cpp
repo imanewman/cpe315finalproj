@@ -537,15 +537,17 @@ void execute() {
           BitCount = countBits(misc.instr.push.reg_list) + misc.instr.push.m;
           offset = 4*BitCount;
           addr = SP - offset;
-          //cout << "addr: " << addr << endl;
+          
           for (i = 0; i < 8; i++) {
             if ((misc.instr.push.reg_list >> i ) & 1) {
               dmem.write(addr, rf[i]);
+              //cout << "data: " << rf[i] << endl;
               addr += 4;
             }
           }
           if (misc.instr.push.m) {
             dmem.write(addr, LR);
+            //cout << "data: " << LR << endl;
             addr += 4;
           }
 
@@ -562,15 +564,17 @@ void execute() {
           offset = 4*BitCount;
           addr = SP + offset;
 
-          if (misc.instr.pop.m) {
-            rf.write(PC_REG, dmem[addr]);
-            addr -= 4;
-          }
           for (i = 8; i >= 0; i--) {
             if ((misc.instr.pop.reg_list >> i ) & 1) {
               rf.write(i, dmem[addr]);
+              //cout << "data: " << dmem[addr] << endl;
               addr -= 4;
             }
+          }
+          if (misc.instr.pop.m) {
+            rf.write(PC_REG, dmem[addr]);
+            //cout << "data: " << dmem[addr] << endl;
+            addr -= 4;
           }
 
           rf.write(SP_REG, SP + offset);
