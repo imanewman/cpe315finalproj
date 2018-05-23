@@ -502,7 +502,7 @@ int decode (const LDM_Type data) {
         bool multiple = FALSE;
     cout << "ldm ";
     cout << "r" << data.instr.ldm.rn;
-    cout << "!, [";
+    cout << ", [";
     if (data.instr.ldm.reg_list & 1) {
       cout << "r0";
       multiple = TRUE;
@@ -560,7 +560,7 @@ int decode (const STM_Type data) {
     bool multiple = FALSE;
     cout << "stm ";
     cout << "r" << data.instr.stm.rn;
-    cout << "!, [";
+    cout << ", [";
     if (data.instr.stm.reg_list & 1) {
       cout << "r0";
       multiple = TRUE;
