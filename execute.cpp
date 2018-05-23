@@ -1,6 +1,6 @@
 #include "thumbsim.hpp"
 // These are just the register NUMBERS
-#define PC_REG 15  
+#define PC_REG 15
 #define LR_REG 14
 #define SP_REG 13
 
@@ -14,7 +14,7 @@ Caches caches(0);
 
 // CPE 315: you'll need to implement a custom sign-extension function
 // in addition to the ones given below, specifically for the unconditional
-// branch instruction, which has an 11-bit immediate field
+// branch instruction, which has an 11-bit immediate field: COMPLETE
 unsigned int signExtend16to32ui(short i) {
   return static_cast<unsigned int>(static_cast<int>(i));
 }
@@ -24,7 +24,7 @@ unsigned int signExtend8to32ui(char i) {
 }
 
 unsigned int signExtend11to32ui(short i) {
-  if (i & 0x0400) 
+  if (i & 0x0400)
     i |= 0xf800;
 
   return signExtend16to32ui(i);
@@ -62,9 +62,9 @@ int countBits(int reg_list) {
 
 void printRegisters(int s) {
   cout << "REG VALUES: " << endl;
-  cout << " 0: " << rf[0] << " 1: " << rf[1] << " 2: " << rf[2] << " 3: " << rf[3] << endl; 
+  cout << " 0: " << rf[0] << " 1: " << rf[1] << " 2: " << rf[2] << " 3: " << rf[3] << endl;
   cout << " 4: " << rf[4] << " 5: " << rf[5] << " 6: " << rf[6] << " 7: " << rf[7] << endl;
-  cout << " PC: " << hex << rf[PC_REG] << " LR: " << rf[LR_REG] << " SP: " << hex << rf[SP_REG] << endl; 
+  cout << " PC: " << hex << rf[PC_REG] << " LR: " << rf[LR_REG] << " SP: " << hex << rf[SP_REG] << endl;
   cout << " N: " << flags.N << " Z: " << flags.Z << " C: " << flags.C << " V: " << flags.V << endl;
   sleep(s);
 }
@@ -127,7 +127,7 @@ void setCarryOverflow (int num1, int num2, OFType oftype) {
   }
 }
 
-// CPE 315: You're given the code for evaluating BEQ, and you'll need to 
+// CPE 315: You're given the code for evaluating BEQ, and you'll need to
 // complete the rest of these conditions. See Page 208 of the armv7 manual
 // *** actually on page 320: COMPLETE
 static int checkCondition(unsigned short cond) {
@@ -358,7 +358,7 @@ void execute() {
           break;
       }
       break;
-    case BL: 
+    case BL:
       // This instruction is complete, nothing needed here
       bl_ops = decode(blupper);
       if (bl_ops == BL_UPPER) {
@@ -366,7 +366,7 @@ void execute() {
         instr2 = imem[PC];
         BL_Type bllower(instr2);
         if (blupper.instr.bl_upper.s) {
-          addr = static_cast<unsigned int>(0xff<<24) | 
+          addr = static_cast<unsigned int>(0xff<<24) |
             ((~(bllower.instr.bl_lower.j1 ^ blupper.instr.bl_upper.s))<<23) |
             ((~(bllower.instr.bl_lower.j2 ^ blupper.instr.bl_upper.s))<<22) |
             ((blupper.instr.bl_upper.imm10)<<12) |
@@ -382,7 +382,7 @@ void execute() {
         rf.write(PC_REG, PC + 2 + addr);
 
         stats.numRegReads += 1;
-        stats.numRegWrites += 2; 
+        stats.numRegWrites += 2;
       }
       else {
         cerr << "Bad BL format." << endl;
@@ -602,17 +602,17 @@ void execute() {
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + offset);
 
-        if (offset > 0) 
+        if (offset > 0)
           stats.numForwardBranchesTaken++;
-        else 
+        else
           stats.numBackwardBranchesTaken++;
 
         stats.numRegReads++;
         stats.numRegWrites++;
       } else {
-        if (offset > 0) 
+        if (offset > 0)
           stats.numForwardBranchesNotTaken++;
-        else 
+        else
           stats.numBackwardBranchesNotTaken++;
       }
       break;
@@ -622,7 +622,7 @@ void execute() {
       decode(uncond);
       offset = 2 * signExtend11to32ui(uncond.instr.b.imm) + 2; //needs new SE func?
 
-      rf.write(PC_REG, PC + offset); 
+      rf.write(PC_REG, PC + offset);
 
       stats.numRegReads++;
       stats.numRegWrites++;
