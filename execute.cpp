@@ -500,7 +500,7 @@ void execute() {
 
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt].data_ubyte4(3));
           
-          caches.access(addr);
+          caches.access(addr + 3);
 
           stats.numRegReads +=2;
           stats.numMemWrites++;
@@ -511,7 +511,7 @@ void execute() {
 
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr].data_ubyte4(3));
           
-          caches.access(addr);
+          caches.access(addr + 3);
 
           stats.numRegWrites++;
           stats.numRegReads++;
@@ -523,7 +523,7 @@ void execute() {
 
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt].data_ubyte4(3));
 
-          caches.access(addr);
+          caches.access(addr + 3);
 
           stats.numRegReads +=3;
           stats.numMemWrites++;
@@ -534,7 +534,7 @@ void execute() {
 
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr].data_ubyte4(3));
 
-          caches.access(addr);
+          caches.access(addr + 3);
 
           stats.numRegWrites++;
           stats.numRegReads +=2;
@@ -557,7 +557,7 @@ void execute() {
               dmem.write(addr, rf[i]);
 
               caches.access(addr);
-              //cout << "data: " << rf[i] << endl;
+
               addr += 4;
             }
           }
@@ -565,7 +565,7 @@ void execute() {
             dmem.write(addr, LR);
 
             caches.access(addr);
-            //cout << "data: " << LR << endl;
+
             addr += 4;
           }
 
@@ -587,7 +587,7 @@ void execute() {
               rf.write(i, dmem[addr]);
 
               caches.access(addr);
-              //cout << "data: " << dmem[addr] << endl;
+
               addr += 4;
             }
           }
@@ -595,7 +595,6 @@ void execute() {
             rf.write(PC_REG, dmem[addr]);
 
             caches.access(addr);
-            //cout << "data: " << dmem[addr] << endl;
           }
 
           rf.write(SP_REG, SP + offset);
