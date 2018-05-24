@@ -1,6 +1,7 @@
 FILES = main.cpp decode.cpp thumbsim_driver.cpp parse.cpp execute.cpp
 UNIX4 = tnewma03@unix4.csc.calpoly.edu
 CO = .completeoutput
+MO = myOutputs/
 F = fib
 B = bytetest
 S0 = shang.O0
@@ -25,29 +26,29 @@ scpm :
 #tests
 
 $(F) :
-	./thumbsim -i -d -s -c 256 -f inputs/$(F).sim > myOutputs/my$(F)$(CO)
-	diff --text outputs/$(F)$(CO) myOutputs/my$(F)$(CO) > myOutputs/$(F)diff.txt
-	cat $(F)diff.txt
+	./thumbsim -i -d -s -c 256 -f inputs/$(F).sim > $(MO)my$(F)$(CO)
+	diff --text outputs/$(F)$(CO) $(MO)my$(F)$(CO) > $(MO)$(F)diff.txt
+	cat $(MO)$(F)diff.txt
 
 $(B) :
-	./thumbsim -i -d -s -c 256 -f inputs/$(B).sim > myOutputs/my$(B)$(CO)
-	diff --text outputs/$(B)$(CO) myOutputs/my$(B)$(CO) > myOutputs/$(B)diff.txt
-	cat $(B)diff.txt
+	./thumbsim -i -d -s -c 256 -f inputs/$(B).sim > $(MO)my$(B)$(CO)
+	diff --text outputs/$(B)$(CO) $(MO)my$(B)$(CO) > $(MO)$(B)diff.txt
+	cat $(MO)$(B)diff.txt
 
 $(S0) :
-	./thumbsim -i -d -s -c 256 -f inputs/$(S0).sim > myOutputs/my$(S0)$(CO)
-	diff --text outputs/$(S0)$(CO) myOutputs/my$(S0)$(CO) > myOutputs/$(S0)diff.txt
-	cat $(S0)diff.tx
+	./thumbsim -i -d -s -c 256 -f inputs/$(S0).sim > $(MO)my$(S0)$(CO)
+	diff --text outputs/$(S0)$(CO) $(MO)my$(S0)$(CO) > $(MO)$(S0)diff.txt
+	cat $(MO)$(S0)diff.tx
 
 $(S1) :
-	./thumbsim -i -d -s -c 256 -f inputs/$(S1).sim > myOutputs/my$(S1)$(CO)
-	diff --text outputs/$(S1)$(CO) myOutputs/my$(S1)$(CO) > myOutputs$(S1)diff.txt
-	cat $(S1)diff.tx
+	./thumbsim -i -d -s -c 256 -f inputs/$(S1).sim > $(MO)my$(S1)$(CO)
+	diff --text outputs/$(S1)$(CO) $(MO)my$(S1)$(CO) > $(MO)$(S1)diff.txt
+	cat $(MO)$(S1)diff.tx
 
 $(S2) :
-	./thumbsim -i -d -s -c 256 -f inputs/$(S2).sim > myOutputs/my$(S2)$(CO)
-	diff --text outputs/$(S2)$(CO) myOutputs/my$(S2)$(CO) > myOutputs/$(S2)diff.txt
-	cat $(S2)diff.tx
+	./thumbsim -i -d -s -c 256 -f inputs/$(S2).sim > $(MO)my$(S2)$(CO)
+	diff --text outputs/$(S2)$(CO) $(MO)my$(S2)$(CO) > $(MO)$(S2)diff.txt
+	cat $(MO)$(S2)diff.tx
 
 clean:
 	rm -rf ./*.o ./thumbsim

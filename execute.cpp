@@ -501,7 +501,11 @@ void execute() {
           // functionally complete, needs stats: COMPLETE
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4 - 3;
 
-          dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt].data_ubyte4(3));
+          temp = dmem[addr];
+          temp = temp & 0xffffff00;
+          temp = temp | rf[ld_st.instr.ld_st_imm.rt].data_ubyte4(3);
+
+          dmem.write(addr, temp);
           
           caches.access(addr + 3);
 
@@ -524,7 +528,11 @@ void execute() {
           // functionally complete, needs stats: COMPLETE
           addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] - 3;
 
-          dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt].data_ubyte4(3));
+          temp = dmem[addr];
+          temp = temp & 0xffffff00;
+          temp = temp | rf[ld_st.instr.ld_st_reg.rt].data_ubyte4(3);
+
+          dmem.write(addr, temp);
 
           caches.access(addr + 3);
 
