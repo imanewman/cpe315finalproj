@@ -117,7 +117,7 @@ bool Cache::access(unsigned int address) {
   } else {
     misses++;
     entries[block] = tag;
-    cout << "miss blocksize " << dec << blocksize << " addr " << hex << address << endl;
+    //cout << "miss blocksize " << dec << blocksize << " addr " << hex << address << endl;
     return false;
   }
 }

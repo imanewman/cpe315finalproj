@@ -580,7 +580,7 @@ void execute() {
           // needs stats: COMPLETE
           BitCount = countBits(misc.instr.pop.reg_list) + misc.instr.pop.m;
           offset = 4*BitCount;
-          addr = SP + offset;
+          addr = SP;
 
           for (i = 8; i >= 0; i--) {
             if ((misc.instr.pop.reg_list >> i ) & 1) {
@@ -588,15 +588,14 @@ void execute() {
 
               caches.access(addr);
               //cout << "data: " << dmem[addr] << endl;
-              addr -= 4;
+              addr += 4;
             }
           }
           if (misc.instr.pop.m) {
             rf.write(PC_REG, dmem[addr]);
-            
+
             caches.access(addr);
             //cout << "data: " << dmem[addr] << endl;
-            addr -= 4;
           }
 
           rf.write(SP_REG, SP + offset);
