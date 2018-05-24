@@ -30,6 +30,8 @@ unsigned int signExtend11to32ui(short i) {
   return signExtend16to32ui(i);
 }
 
+//int changed = 0;
+
 // This is the global object you'll use to store condition codes N,Z,V,C
 // Set these bits appropriately in execute below.
 ASPR flags;
@@ -67,9 +69,9 @@ void printRegisters(int s) {
        << " 4: " << dec << rf[4] << " 5: " << dec << rf[5] << " 6: " << dec << rf[6] 
        << " 7: " << dec << rf[7] << endl
        << " PC: 0x" << hex << rf[PC_REG] << " LR: 0x" << hex << rf[LR_REG] 
-       << " SP: 0x" << hex << rf[SP_REG] << endl
-       << " N: " << dec << flags.N << " Z: " << dec << flags.Z 
-       << " C: " << dec << flags.C << " V: " << dec << flags.V << endl << endl;
+       << " SP: 0x" << hex << rf[SP_REG] << endl;
+       //<< " N: " << dec << flags.N << " Z: " << dec << flags.Z 
+       //<< " C: " << dec << flags.C << " V: " << dec << flags.V << endl << endl;
   sleep(s);
 }
 
@@ -568,7 +570,8 @@ void execute() {
               dmem.write(addr, rf[i]);
 
               caches.access(addr);
-
+              //cout << "***** r" << i << " data: " << dec << rf[i] 
+              //     << " addr: 0x" << hex << addr << endl;
               addr += 4;
             }
           }
@@ -576,8 +579,8 @@ void execute() {
             dmem.write(addr, LR);
 
             caches.access(addr);
-
-            addr += 4;
+            //cout << "***** LR data: " << dec << LR 
+            //     << " addr: 0x" << hex << addr << endl;
           }
 
           rf.write(SP_REG, SP - offset);
@@ -598,7 +601,8 @@ void execute() {
               rf.write(i, dmem[addr]);
 
               caches.access(addr);
-
+              //cout << "***** r" << i << " data: " << dec << rf[i]
+              //     << " addr: 0x" << hex << addr << endl;
               addr += 4;
             }
           }
@@ -606,6 +610,8 @@ void execute() {
             rf.write(PC_REG, dmem[addr]);
 
             caches.access(addr);
+              //cout << "***** PC data: " << dec << PC
+              //     << " addr: 0x" << hex << addr << endl;
           }
 
           rf.write(SP_REG, SP + offset);
@@ -670,7 +676,7 @@ void execute() {
       // need to implement: COMPLETE
       BitCount = countBits(ldm.instr.ldm.reg_list);
       offset = 4*BitCount;
-      addr =  rf[ldm.instr.ldm.rn] + offset;
+      addr =  rf[ldm.instr.ldm.rn] - offset;
 
       for (i = 8; i >= 0; i--) {
         if ((ldm.instr.ldm.reg_list >> i ) & 1) {
@@ -678,11 +684,11 @@ void execute() {
 
           caches.access(addr);
 
-          addr -= 4;
+          addr += 4;
         }
       }
 
-      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] + offset);
+      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] - offset);
 
       stats.numMemReads += BitCount;
       stats.numRegWrites += BitCount + 1;
@@ -693,7 +699,7 @@ void execute() {
       // need to implement: COMPLETE
       BitCount = countBits(stm.instr.stm.reg_list);
       offset = 4*BitCount;
-      addr = rf[stm.instr.stm.rn] - offset;
+      addr = rf[stm.instr.stm.rn];
       //cout << "addr: " << addr << endl;
       for (i = 0; i < 8; i++) {
         if ((stm.instr.stm.reg_list >> i ) & 1) {
@@ -705,7 +711,7 @@ void execute() {
         }
       }
 
-      rf.write(stm.instr.stm.rn, rf[stm.instr.stm.rn] - offset);
+      rf.write(stm.instr.stm.rn, rf[stm.instr.stm.rn] + offset);
 
       stats.numMemWrites += BitCount;
       stats.numRegReads += BitCount + 1;

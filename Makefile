@@ -5,8 +5,8 @@ MO = myOutputs/
 F = fib
 B = bytetest
 S0 = shang.O0
-s1 = shang.O1
-s2 = shang.O2
+S1 = shang.O1
+S2 = shang.O2
 
 all :
 	g++ -g $(FILES) -o thumbsim
@@ -35,17 +35,17 @@ $(B) :
 	diff --text outputs/$(B)$(CO) $(MO)my$(B)$(CO) > $(MO)$(B)diff.txt
 	cat $(MO)$(B)diff.txt
 
-$(S0) :
+O0 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S0).sim > $(MO)my$(S0)$(CO)
 	diff --text outputs/$(S0)$(CO) $(MO)my$(S0)$(CO) > $(MO)$(S0)diff.txt
 	cat $(MO)$(S0)diff.tx
 
-$(S1) :
+O1 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S1).sim > $(MO)my$(S1)$(CO)
 	diff --text outputs/$(S1)$(CO) $(MO)my$(S1)$(CO) > $(MO)$(S1)diff.txt
 	cat $(MO)$(S1)diff.tx
 
-$(S2) :
+O2 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S2).sim > $(MO)my$(S2)$(CO)
 	diff --text outputs/$(S2)$(CO) $(MO)my$(S2)$(CO) > $(MO)$(S2)diff.txt
 	cat $(MO)$(S2)diff.tx
