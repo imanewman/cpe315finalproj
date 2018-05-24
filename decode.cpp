@@ -613,9 +613,9 @@ int decode (const STM_Type data) {
 }
 
 int decode (const LDRL_Type data) {
-  // 315: add code to print ldr
+  // 315: add code to print ldr: COMPLETE
   if (opts.instrs) { 
-    cout << endl;
+    cout << "ldr r" << data.instr.ldrl.rt << ", [pc, #" << setbase(10) << data.instr.ldrl.imm * 4 << "]" << endl;
   }
   return LDRL;
 }
