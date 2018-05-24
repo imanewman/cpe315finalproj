@@ -454,6 +454,8 @@ void execute() {
 
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
 
+          caches.access(addr);
+
           stats.numRegReads +=2;
           stats.numMemWrites++;
           break;
@@ -462,6 +464,8 @@ void execute() {
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
 
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
+
+          caches.access(addr);
 
           stats.numRegWrites++;
           stats.numRegReads++;
@@ -473,6 +477,8 @@ void execute() {
 
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt]);
 
+          caches.access(addr);
+
           stats.numRegReads +=3;
           stats.numMemWrites++;
           break;
@@ -481,6 +487,8 @@ void execute() {
           addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
 
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr]);
+
+          caches.access(addr);
 
           stats.numRegWrites++;
           stats.numRegReads +=2;
@@ -491,8 +499,9 @@ void execute() {
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4 - 3;
 
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt].data_ubyte4(3));
-          /*cout << "address: " << hex << addr 
-                << ", data: " << rf[ld_st.instr.ld_st_imm.rt] << endl;*/
+          
+          caches.access(addr);
+
           stats.numRegReads +=2;
           stats.numMemWrites++;
           break;
@@ -501,8 +510,9 @@ void execute() {
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4 - 3;
 
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr].data_ubyte4(3));
-          /*cout << "address: " << hex << addr 
-                << ", data: " << rf[ld_st.instr.ld_st_imm.rt] << endl;*/
+          
+          caches.access(addr);
+
           stats.numRegWrites++;
           stats.numRegReads++;
           stats.numMemReads++;
@@ -513,6 +523,8 @@ void execute() {
 
           dmem.write(addr, rf[ld_st.instr.ld_st_reg.rt].data_ubyte4(3));
 
+          caches.access(addr);
+
           stats.numRegReads +=3;
           stats.numMemWrites++;
           break;
@@ -521,6 +533,8 @@ void execute() {
           addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm] - 3;
 
           rf.write(ld_st.instr.ld_st_reg.rt, dmem[addr].data_ubyte4(3));
+
+          caches.access(addr);
 
           stats.numRegWrites++;
           stats.numRegReads +=2;
@@ -541,12 +555,16 @@ void execute() {
           for (i = 0; i < 8; i++) {
             if ((misc.instr.push.reg_list >> i ) & 1) {
               dmem.write(addr, rf[i]);
+
+              caches.access(addr);
               //cout << "data: " << rf[i] << endl;
               addr += 4;
             }
           }
           if (misc.instr.push.m) {
             dmem.write(addr, LR);
+
+            caches.access(addr);
             //cout << "data: " << LR << endl;
             addr += 4;
           }
@@ -567,12 +585,16 @@ void execute() {
           for (i = 8; i >= 0; i--) {
             if ((misc.instr.pop.reg_list >> i ) & 1) {
               rf.write(i, dmem[addr]);
+
+              caches.access(addr);
               //cout << "data: " << dmem[addr] << endl;
               addr -= 4;
             }
           }
           if (misc.instr.pop.m) {
             rf.write(PC_REG, dmem[addr]);
+            
+            caches.access(addr);
             //cout << "data: " << dmem[addr] << endl;
             addr -= 4;
           }
@@ -644,6 +666,9 @@ void execute() {
       for (i = 8; i >= 0; i--) {
         if ((ldm.instr.ldm.reg_list >> i ) & 1) {
           rf.write(i, dmem[addr]);
+
+          caches.access(addr);
+
           addr -= 4;
         }
       }
@@ -664,6 +689,9 @@ void execute() {
       for (i = 0; i < 8; i++) {
         if ((stm.instr.stm.reg_list >> i ) & 1) {
           dmem.write(addr, rf[i]);
+
+          caches.access(addr);
+
           addr += 4;
         }
       }
@@ -687,6 +715,9 @@ void execute() {
       // Requires two consecutive imem locations pieced together
       temp = imem[addr] | (imem[addr+2]<<16);  // temp is a Data32
       rf.write(ldrl.instr.ldrl.rt, temp);
+
+      caches.access(addr);
+      caches.access(addr+2);
 
       // One write for updated reg
       stats.numRegWrites++;

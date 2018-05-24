@@ -49,7 +49,6 @@ template<>
 void Memory<Data32, Data32>::write(const unsigned int addr, const Data32 data) {
   unsigned int myAddr = addr - base;
   m[myAddr] = data;
-  //  cout << "not in range: " << hex << addr << ": " << data << endl;
 }
 
 template<>
@@ -109,11 +108,18 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 // cache size in blocks). You should also update the "hits" and
 // "misses" counters.
 bool Cache::access(unsigned int address) {
-  int addr = address % blocksize;
+  int block = address % size / blocksize;
+  int tag = address >> 16;
 
-  //if (entries[addr])
-
-  return false;
+  if (entries[block] == tag) {
+    hits++;
+    return true;
+  } else {
+    misses++;
+    entries[block] = tag;
+    cout << "miss blocksize " << dec << blocksize << " addr " << hex << address << endl;
+    return false;
+  }
 }
 
 void Stats::print() {
