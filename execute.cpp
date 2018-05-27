@@ -596,7 +596,7 @@ void execute() {
           offset = 4*BitCount;
           addr = SP;
 
-          for (i = 8; i >= 0; i--) {
+          for (i = 0; i < 8; i++) {
             if ((misc.instr.pop.reg_list >> i ) & 1) {
               rf.write(i, dmem[addr]);
 
