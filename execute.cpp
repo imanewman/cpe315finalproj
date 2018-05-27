@@ -646,7 +646,7 @@ void execute() {
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + offset);
 
-        if (offset > 0) 
+        if (offset - 2 > 0) 
           stats.numForwardBranchesTaken++;
         else 
           stats.numBackwardBranchesTaken++;
@@ -654,7 +654,7 @@ void execute() {
         stats.numRegReads++;
         stats.numRegWrites++;
       } else {
-        if (offset > 0) 
+        if (offset - 2 > 0) 
           stats.numForwardBranchesNotTaken++;
         else 
           stats.numBackwardBranchesNotTaken++;
