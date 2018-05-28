@@ -51,6 +51,15 @@ void Memory<Data32, Data32>::write(const unsigned int addr, const Data32 data) {
   m[myAddr] = data;
 }
 
+/*template<>
+void Memory<Data8, Data8>::write(const unsigned int addr, const Data8 data) {
+  unsigned int myAddr = addr - base;
+
+  //m[myAddr] = m[myAddr] & 0xffffff00;
+  //m[myAddr] = m[myAddr] | Data32(data);
+  m[myAddr] = data;
+}*/
+
 template<>
 const Data32 Memory<Data8, Data32>::operator[](const unsigned int addr) const {
   unsigned int myAddr = addr - base;
@@ -68,6 +77,12 @@ const Data32 Memory<Data32, Data32>::operator[](const unsigned int addr) const {
   unsigned int myAddr = addr - base;
   return m[myAddr];
 }
+
+/*template<>
+const Data8 Memory<Data32, Data8>::operator[](const unsigned int addr) const {
+  unsigned int myAddr = addr - base;
+  return Data8(m[myAddr]);
+}*/
 
 template<>
 void Memory<Data8, Data32>::dump(DataType dt) const {
@@ -106,10 +121,10 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 // evaluate "entries[b] = t;". The locals you have available to help
 // you make this decision are "blocksize" (in bytes) and "size" (total
 // cache size in blocks). You should also update the "hits" and
-// "misses" counters.
+// "misses" counters: COMPLETE
 bool Cache::access(unsigned int address) {
   int block = address % size / blocksize;
-  int tag = address >> 16;
+  int tag = address >> (int)(log2(blocksize) + log2(size / blocksize));
 
   if (entries[block] == tag) {
     hits++;
