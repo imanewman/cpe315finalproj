@@ -677,7 +677,7 @@ void execute() {
       // need to implement: COMPLETE
       BitCount = countBits(ldm.instr.ldm.reg_list);
       offset = 4*BitCount;
-      addr =  rf[ldm.instr.ldm.rn] - offset;
+      addr =  rf[ldm.instr.ldm.rn];
 
       for (i = 0; i < 8; i++) {
         if ((ldm.instr.ldm.reg_list >> i ) & 1) {
@@ -689,7 +689,7 @@ void execute() {
         }
       }
 
-      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] - offset);
+      rf.write(ldm.instr.ldm.rn, rf[ldm.instr.ldm.rn] + offset);
 
       stats.numMemReads += BitCount;
       stats.numRegWrites += BitCount + 1;
