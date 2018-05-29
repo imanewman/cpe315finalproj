@@ -642,7 +642,8 @@ void execute() {
       // this should work for all your conditional branches.
       // needs stats: COMPLETE
       offset = 2 * signExtend8to32ui(cond.instr.b.imm) + 2;
-
+      //cout << "immediate: " << cond.instr.b.imm 
+      //     << " offset: " << offset << endl;
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + offset);
 
@@ -678,7 +679,7 @@ void execute() {
       offset = 4*BitCount;
       addr =  rf[ldm.instr.ldm.rn] - offset;
 
-      for (i = 8; i >= 0; i--) {
+      for (i = 0; i < 8; i++) {
         if ((ldm.instr.ldm.reg_list >> i ) & 1) {
           rf.write(i, dmem[addr]);
 
