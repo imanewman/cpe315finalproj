@@ -38,17 +38,17 @@ $(B) :
 O0 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S0).sim > $(MO)my$(S0)$(CO)
 	diff --text outputs/$(S0)$(CO) $(MO)my$(S0)$(CO) > $(MO)$(S0)diff.txt
-	cat $(MO)$(S0)diff.tx
+	cat $(MO)$(S0)diff.txt
 
 O1 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S1).sim > $(MO)my$(S1)$(CO)
 	diff --text outputs/$(S1)$(CO) $(MO)my$(S1)$(CO) > $(MO)$(S1)diff.txt
-	cat $(MO)$(S1)diff.tx
+	cat $(MO)$(S1)diff.txt
 
 O2 :
 	./thumbsim -i -d -s -c 256 -f inputs/$(S2).sim > $(MO)my$(S2)$(CO)
 	diff --text outputs/$(S2)$(CO) $(MO)my$(S2)$(CO) > $(MO)$(S2)diff.txt
-	cat $(MO)$(S2)diff.tx
+	cat $(MO)$(S2)diff.txt
 
 clean:
 	rm -rf ./*.o ./thumbsim
