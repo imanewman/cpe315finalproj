@@ -732,9 +732,6 @@ void execute() {
       temp = imem[addr] | (imem[addr+2]<<16);  // temp is a Data32
       rf.write(ldrl.instr.ldrl.rt, temp);
 
-      //caches.access(addr);
-      //caches.access(addr+2);
-
       // One write for updated reg
       stats.numRegWrites++;
       // One read of the PC
